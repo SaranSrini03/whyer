@@ -1,5 +1,9 @@
 'use client';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
+
+import { useRouter } from 'next/navigation';
+
 import Link from 'next/link';
 
 export default function SignupPage() {
@@ -10,12 +14,26 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle signup logic here
-    console.log({ name, email, username, dob, password, confirmPassword, agreeTerms });
+
+    const res = await fetch('/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, username, email, dob, password }),
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      toast.success('Signup successful!');
+    setTimeout(() => router.push('/login'), 1500);
+  } else {
+    const data = await res.json();
+    toast.error(data.message || 'Signup failed.');}
   };
+
 
   return (
     <main className="min-h-screen bg-black text-white font-mono">
@@ -26,7 +44,7 @@ export default function SignupPage() {
       </div>
 
       {/* Grid pattern */}
-      <div 
+      <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23fde047' stroke-width='0.7'%3E%3Cpath d='M0 0h60v60H0z'/%3E%3C/g%3E%3C/svg%3E")`,
@@ -68,16 +86,16 @@ export default function SignupPage() {
               />
             </div>
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-400 mb-2">
+              <label htmlFor="username" className="block text-sm font-medium text-gray-400 mb-2">
                 Username
               </label>
               <input
-                id="name"
-                name="name"
+                id="username"
+                name="username"
                 type="text"
-                autoComplete="name"
+                autoComplete="username"
                 required
-                value={name}
+                value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent placeholder-gray-600"
                 placeholder="Enter your name"
@@ -216,7 +234,7 @@ export default function SignupPage() {
               </svg>
               <span className="ml-2 text-sm font-medium text-gray-300">GitHub</span>
             </button>
-            
+
             <button
               type="button"
               className="flex justify-center items-center py-2.5 px-4 bg-black border border-gray-800 rounded-lg hover:bg-gray-900 transition-all duration-300"

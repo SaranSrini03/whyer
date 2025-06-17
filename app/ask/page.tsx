@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Footer from '@/components/Footer';
+import NavBar from '@/components/NavBar';
 
 export default function AskPage() {
   const [title, setTitle] = useState('');
@@ -54,29 +54,7 @@ export default function AskPage() {
       ></div>
 
       {/* Header */}
-      <div className="relative z-10 border-b border-yellow-900/30 py-6">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex justify-between items-center">
-          <Link href="/" className="flex items-center">
-
-            <span className="text-xl font-light">
-              <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                Whyer
-              </span>
-            </span>
-          </Link>
-          <nav className="flex space-x-6">
-            <Link href="/" className="text-gray-400 hover:text-yellow-400 transition-colors duration-300">
-              Home
-            </Link>
-            <Link href="/ask" className="text-yellow-400">
-              Ask
-            </Link>
-            <Link href="/profile" className="text-gray-400 hover:text-yellow-400 transition-colors duration-300">
-              Profile
-            </Link>
-          </nav>
-        </div>
-      </div>
+    <NavBar />
 
       {/* Main content */}
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 py-16">

@@ -2,6 +2,7 @@
 import './globals.css';
 import { ReactNode } from 'react';
 import Footer from '@/components/Footer';
+import { Toaster } from 'react-hot-toast';
 
 export const metadata = {
   title: 'Whyer',
@@ -13,6 +14,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body className="bg-black text-white font-mono">
         {children}
+        <Toaster position="top-right" />
         <Footer />
       </body>
     </html>
