@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import { connectToDB } from '@/lib/db';
+import  User  from '@/models/User';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
 
@@ -17,7 +18,16 @@ export async function GET(req: NextRequest) {
     await connectToDB(); // connect to MongoDB
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
 
-    const user = await User.findById(decoded.userId).lean();
+    interface IUser {
+      _id: string;
+      name: string;
+      username: string;
+      email: string;
+      createdAt: Date;
+      // add other fields if needed
+    }
+
+    const user = await User.findById(decoded.userId).lean<IUser>();
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 export type MeType = {
+  questionsCount: number;
   _id: string;
   name: string;
   username: string;

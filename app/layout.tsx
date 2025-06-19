@@ -1,7 +1,7 @@
 // app/layout.tsx
 import './globals.css';
 import { ReactNode } from 'react';
-import Footer from '@/components/Footer';
+import Footer from '@/components/Assests/Footer';
 import { Toaster } from 'react-hot-toast';
 
 export const metadata = {

@@ -3,8 +3,8 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'
-import Navbar from '@/components/NavBar';
-import WhyCard from '@/components/WhyCard';
+import Navbar from '@/components/Assests/NavBar';
+import WhyCard from '@/components/Assests/WhyCard';
 import GridBackground from '@/components/Background/GridBackground';
 import GradientBackground from '@/components/Background/GradientBackground';
 

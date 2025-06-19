@@ -1,6 +1,6 @@
 // app/page.tsx
-import WelcomePage from '@/components/Welcome';
-import HomePage from '@/components/HomePage';
+import WelcomePage from '@/components/Welcome/Welcome';
+import HomePage from '@/components/Welcome/HomePage';
 import { cookies } from 'next/headers';
 
 export default async function Home() {

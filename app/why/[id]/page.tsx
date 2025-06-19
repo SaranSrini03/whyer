@@ -1,6 +1,6 @@
 // app/why/[id]/page.tsx
 import { connectToDB } from '@/lib/db';
-import PulseSection from '@/components/PulseSection';
+import PulseSection from '@/components/Assests/PulseSection';
 import Why from '@/models/Why';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';

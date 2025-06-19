@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import NavBar from '@/components/NavBar';
+import NavBar from '@/components/Assests/NavBar';
 
 export default function AskPage() {
   const [title, setTitle] = useState('');

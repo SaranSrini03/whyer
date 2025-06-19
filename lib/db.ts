@@ -3,26 +3,27 @@ import mongoose from 'mongoose';
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error('🚨 Please define MONGODB_URI in .env.local');
+  throw new Error('Please define MONGODB_URI in .env');
 }
 
-// Caching because Next.js hot-reloads often
-let cached = (global as any).mongoose;
+let isConnected = false;
 
-if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
-}
-
-export async function connectToDB() {
-  if (cached.conn) return cached.conn;
-
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI!, {
-      dbName: 'whyer',
-      bufferCommands: false,
-    });
+export const connectToDB = async () => {
+  if (isConnected) {
+    console.log('✅ Using existing MongoDB connection');
+    return;
   }
 
-  cached.conn = await cached.promise;
-  return cached.conn;
-}
+  try {
+    await mongoose.connect(MONGODB_URI, {
+      dbName: 'whyer',
+      serverSelectionTimeoutMS: 5000, // Timeout after 5s
+    } as any);
+    
+    isConnected = true;
+    console.log('✅ MongoDB connected');
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err);
+    throw err;
+  }
+};

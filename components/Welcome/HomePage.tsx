@@ -1,7 +1,7 @@
 // app/page.tsx (Server Component)
 import { connectToDB } from '@/lib/db';
 import Why from '@/models/Why';
-import ClientHome from '@/components/ClientHome';
+import ClientHome from '@/components/Welcome/ClientHome';
 
 export default async function HomePage() {
   await connectToDB();
