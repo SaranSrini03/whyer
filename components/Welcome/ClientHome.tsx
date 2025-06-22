@@ -49,7 +49,7 @@ export default function ClientHome({ whys }: { whys: any[] }) {
         <LeftSidebar />
 
         {/* Scrollable Main Feed */}
-        <div className="w-full max-w-5xl overflow-y-auto pr-2  hide-scrollbar">
+        <div className="w-full max-w-5xl overflow-y-auto pl-2 pr-2  hide-scrollbar">
           <div className="text-center mb-12">
             <h1 className="text-3xl sm:text-4xl font-light mb-4 tracking-tight">
               Recent <span className="text-yellow-400">Whys</span>
@@ -101,6 +101,7 @@ export default function ClientHome({ whys }: { whys: any[] }) {
           <div className="bg-black/5 border border-white/10 backdrop-blur-md p-6 rounded-2xl shadow-lg">
             <h2 className="text-lg font-semibold text-yellow-300 mb-4">
               People You May Know
+
             </h2>
             <SuggestedUsers />
           </div>

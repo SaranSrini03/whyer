@@ -1,33 +1,17 @@
-import mongoose, { Schema, model, models } from 'mongoose';
+import mongoose from 'mongoose';
 
-const WhySchema = new Schema(
+const WhySchema = new mongoose.Schema(
   {
-    title: {
-      type: String,
-      required: [true, 'Why question is required'],
-      trim: true,
-    },
-    description: {
-      type: String,
-      trim: true,
-    },
+    title: String,
+    description: String,
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: false, // make required once user system is in
     },
-    wires: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Wire',
-      },
-    ],
-    tags: [String], // optional: for discoverability
+    userName: String,        // 👈 embed for direct access
+    userUsername: String,    // 👈 embed for direct access
   },
-  {
-    timestamps: true, // adds createdAt and updatedAt
-  }
+  { timestamps: true }
 );
 
-const Why = models.Why || model('Why', WhySchema);
-export default Why;
+export default mongoose.models.Why || mongoose.model('Why', WhySchema);

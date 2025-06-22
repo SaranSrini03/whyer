@@ -12,12 +12,11 @@ interface WhyCardProps {
     title: string;
     description?: string;
     createdAt: string;
+    userId: string;          // still keeping reference for deeper linking
+    userName: string;        // for display
+    userUsername: string;    // for profile links, handles, etc.
     comments?: any[];
     sparkCount?: number;
-    user?: {
-      name?: string;
-      image?: string;
-    };
     tags?: string[];
   };
 }
@@ -44,9 +43,15 @@ export default function WhyCard({ why }: WhyCardProps) {
   };
 
   // Safe user data handling
-  const userName = why.user?.name || "Anonymous";
+  const userName = why.userName || "Anonymous";
+  const userUsername = why.userUsername || "";
+  const displayName = userUsername
+    ? `${userName} (@${userUsername})`
+    : userName;
+
   const userInitial = userName.charAt(0).toUpperCase();
-  const userImage = why.user?.image;
+  // No user image available in current why object structure
+  const userImage = undefined;
 
   return (
     <Link href={`/why/${why._id}`} className="group block">
@@ -69,7 +74,7 @@ export default function WhyCard({ why }: WhyCardProps) {
             )}
           </div>
           <div className="ml-3">
-            <p className="text-sm font-medium text-gray-300">{userName}</p>
+            <p className="text-sm font-medium text-gray-300">{userUsername}</p>
             <p className="text-xs text-gray-600">
               {new Date(why.createdAt).toLocaleDateString('en-US', {
                 month: 'short',
