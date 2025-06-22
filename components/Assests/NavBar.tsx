@@ -5,6 +5,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMe } from '@/hooks/useMe';
+import Ask from '@/components/Assests/Ask';
+import { Plus } from 'lucide-react';
+
+import Modal from '@/components/Modal';
 
 // Define User interface
 interface User {
@@ -24,6 +28,7 @@ export default function Navbar() {
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const { me } = useMe();
+  const [isAskModalOpen, setIsAskModalOpen] = useState(false);
 
   const profileRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -40,7 +45,7 @@ export default function Navbar() {
         setSearchResults([]);
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -49,11 +54,11 @@ export default function Navbar() {
   const searchUsers = useCallback(async (query: string) => {
     try {
       const response = await fetch(`/api/search/users?q=${encodeURIComponent(query)}`);
-      
+
       if (!response.ok) {
         throw new Error(`Search failed: ${response.status}`);
       }
-      
+
       const data = await response.json();
       return data.users || [];
     } catch (error) {
@@ -104,12 +109,12 @@ export default function Navbar() {
   };
 
   // Handle user selection from search results
-const handleUserSelect = (username: string) => {
-  setSearchQuery('');
-  setSearchResults([]);
-  setIsSearchFocused(false);
-  router.push(`/${username}`); // Now routes to /@username
-};
+  const handleUserSelect = (username: string) => {
+    setSearchQuery('');
+    setSearchResults([]);
+    setIsSearchFocused(false);
+    router.push(`/${username}`); // Now routes to /@username
+  };
 
   // Active link styling
   const isActive = (path: string) => (
@@ -164,7 +169,7 @@ const handleUserSelect = (username: string) => {
           <div className="flex items-center space-x-10">
             {/* Logo */}
             <Link href="/" className="flex items-center group">
-              <motion.span 
+              <motion.span
                 className="text-xl font-medium"
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 10 }}
@@ -178,19 +183,20 @@ const handleUserSelect = (username: string) => {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <Link 
-                href="/" 
-                className={`${isActive('/')} relative transition-colors duration-300 group`}
-              >
-                Home
-                <span className={`absolute -bottom-1 left-0 h-0.5 bg-yellow-400 transition-all duration-300 ${pathname === '/' ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
-              </Link>
-              <Link 
-                href="/trending" 
+
+              <Link
+                href="/trending"
                 className={`${isActive('/trending')} relative transition-colors duration-300 group`}
               >
                 Trending
                 <span className={`absolute -bottom-1 left-0 h-0.5 bg-yellow-400 transition-all duration-300 ${pathname === '/trending' ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
+              </Link>
+              <Link
+                href="/live"
+                className={`${isActive('/live')} relative transition-colors duration-300 group`}
+              >
+                Live
+                <span className={`absolute -bottom-1 left-0 h-0.5 bg-yellow-400 transition-all duration-300 ${pathname === '/live' ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
               </Link>
             </nav>
           </div>
@@ -198,11 +204,10 @@ const handleUserSelect = (username: string) => {
           {/* Right section: Search, Ask Button, and Profile */}
           <div className="flex items-center space-x-6">
             {/* Search Bar */}
-            <form 
+            <form
               onSubmit={handleSearch}
-              className={`hidden md:flex items-center transition-all duration-300 ${
-                isSearchFocused ? 'w-72' : 'w-56'
-              }`}
+              className={`hidden md:flex items-center transition-all duration-300 ${isSearchFocused ? 'w-72' : 'w-56'
+                }`}
             >
               <div className="relative w-full" ref={searchContainerRef}>
                 <input
@@ -266,17 +271,15 @@ const handleUserSelect = (username: string) => {
               whileTap={{ scale: 0.95 }}
               className="hidden md:block"
             >
-              <Link
-                href="/ask"
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-700 text-white hover:from-yellow-600 hover:to-yellow-800 transition-all"
+              <button
+                onClick={() => setIsAskModalOpen(true)}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-black border border-yellow-400 cursor-pointer  text-white hover:from-yellow-600 hover:to-yellow-800 transition-all"
                 aria-label="Ask a question"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-              </Link>
+                <Plus className="h-6 w-6" />
+              </button>
             </motion.div>
+
 
             {/* Profile dropdown */}
             <div className="relative" ref={profileRef}>
@@ -287,7 +290,7 @@ const handleUserSelect = (username: string) => {
                 aria-label="Toggle profile menu"
                 className="relative p-1 rounded-full text-gray-400 hover:text-yellow-400 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500/50"
               >
-                <motion.div 
+                <motion.div
                   className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-700 flex items-center justify-center text-white"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
@@ -310,8 +313,8 @@ const handleUserSelect = (username: string) => {
 
         {/* Mobile Navigation */}
         <div className="md:hidden flex justify-between items-center py-3 border-t border-yellow-900/20 mt-1 px-6">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className={`${isActive('/')} relative transition-colors duration-300 group flex flex-col items-center`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -320,9 +323,9 @@ const handleUserSelect = (username: string) => {
             <span className="text-xs mt-1">Home</span>
             <span className={`absolute -bottom-1 left-0 right-0 h-0.5 bg-yellow-400 transition-all duration-300 ${pathname === '/' ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
           </Link>
-          
-          <Link 
-            href="/trending" 
+
+          <Link
+            href="/trending"
             className={`${isActive('/trending')} relative transition-colors duration-300 group flex flex-col items-center`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -331,8 +334,8 @@ const handleUserSelect = (username: string) => {
             <span className="text-xs mt-1">Trending</span>
             <span className={`absolute -bottom-1 left-0 right-0 h-0.5 bg-yellow-400 transition-all duration-300 ${pathname === '/trending' ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
           </Link>
-          
-          <Link 
+
+          <Link
             href="/ask"
             className={`${isActive('/ask')} relative transition-colors duration-300 group flex flex-col items-center`}
           >
@@ -347,6 +350,11 @@ const handleUserSelect = (username: string) => {
           </Link>
         </div>
       </div>
+      <Modal isOpen={isAskModalOpen} onClose={() => setIsAskModalOpen(false)}>
+        <Ask />
+      </Modal>
+
     </div>
+
   );
 }
