@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# whyer
+
+A production-ready text-based social app built with Next.js 14, TypeScript, MongoDB, and GitHub OAuth.
+
+## Features
+
+- 🔐 GitHub OAuth authentication
+- 📝 Create and view text-only posts (max 1000 characters)
+- ♥️ Like/unlike posts
+- 💬 Comment and reply to comments (one-level nesting)
+- 👥 Follow/unfollow users
+- 📱 Infinite scrolling feed (cursor-based pagination)
+- 💌 One-to-one direct messages
+- 🎨 Dark theme UI inspired by Threads
+
+## Tech Stack
+
+- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes
+- **Database**: MongoDB with Mongoose
+- **Authentication**: NextAuth.js with GitHub OAuth
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ 
+- MongoDB (local or Atlas)
+- GitHub OAuth App
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repo-url>
+cd whyer
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Configure your `.env.local`:
+   - `MONGODB_URI`: Your MongoDB connection string
+   - `NEXTAUTH_URL`: Your app URL (e.g., `http://localhost:3000`)
+   - `NEXTAUTH_SECRET`: Generate a random secret (e.g., `openssl rand -base64 32`)
+   - `GITHUB_CLIENT_ID`: Your GitHub OAuth App Client ID
+   - `GITHUB_CLIENT_SECRET`: Your GitHub OAuth App Client Secret
 
-## Learn More
+5. Set up GitHub OAuth:
+   - Go to GitHub Settings > Developer settings > OAuth Apps
+   - Create a new OAuth App
+   - Set Authorization callback URL to: `http://localhost:3000/api/auth/callback/github`
+   - Copy Client ID and Client Secret to `.env.local`
 
-To learn more about Next.js, take a look at the following resources:
+6. Run the development server:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+7. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Structure
 
-## Deploy on Vercel
+```
+whyer/
+├── app/                    # Next.js App Router pages
+│   ├── api/               # API routes
+│   ├── auth/              # Authentication pages
+│   ├── messages/          # DM pages
+│   ├── post/              # Post detail pages
+│   ├── profile/           # User profile pages
+│   └── page.tsx           # Home feed
+├── components/            # React components
+├── lib/                   # Utilities (db, auth)
+├── models/                # Mongoose schemas
+└── middleware.ts          # Route protection
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## API Routes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `POST /api/posts` - Create a post
+- `GET /api/posts` - Get posts (with pagination)
+- `GET /api/posts/[id]` - Get a single post
+- `POST /api/like` - Like/unlike a post
+- `GET /api/comments` - Get comments for a post
+- `POST /api/comments` - Create a comment/reply
+- `POST /api/follow` - Follow/unfollow a user
+- `GET /api/feed` - Get feed (posts from user + following)
+- `GET /api/messages` - Get messages between users
+- `POST /api/messages` - Send a message
+- `GET /api/users/[username]` - Get user by username
+
+## Database Models
+
+- **User**: githubId, username, name, avatar, bio, followers, following
+- **Post**: author, content, likes, createdAt
+- **Comment**: post, author, content, parentComment, createdAt
+- **Message**: sender, receiver, content, createdAt
+
+## License
+
+MIT

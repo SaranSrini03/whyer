@@ -2,11 +2,14 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Navbar from '@/components/Navbar';
-import Feed from '@/components/Feed';
+import MessageThread from '@/components/MessageThread';
 
-export default async function Home() {
+export default async function MessageThreadPage({
+  params,
+}: {
+  params: { userId: string };
+}) {
   const session = await getServerSession(authOptions);
-
   if (!session) {
     redirect('/auth/signin');
   }
@@ -14,9 +17,10 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-black">
       <Navbar />
-      <main className="pt-8">
-        <Feed currentUserId={session.user.id} />
-      </main>
+      <div className="max-w-2xl mx-auto pt-8 px-4">
+        <MessageThread userId={params.userId} currentUserId={session.user.id} />
+      </div>
     </div>
   );
 }
+
