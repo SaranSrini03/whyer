@@ -42,6 +42,20 @@ export default function Feed({ currentUserId }: { currentUserId?: string }) {
       const currentCursor = reset ? null : cursor;
       const url = `/api/feed${currentCursor ? `?cursor=${currentCursor}` : ''}`;
       const response = await fetch(url, { cache: 'no-store' });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error fetching posts:', response.status, errorText);
+        throw new Error(`Failed to fetch posts: ${response.status}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Expected JSON but got:', contentType, text.substring(0, 100));
+        throw new Error('Invalid response format');
+      }
+      
       const data = await response.json();
 
       if (reset) {
@@ -64,6 +78,16 @@ export default function Feed({ currentUserId }: { currentUserId?: string }) {
 
     try {
       const response = await fetch('/api/feed?limit=10', { cache: 'no-store' });
+      
+      if (!response.ok) {
+        return;
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        return;
+      }
+      
       const data = await response.json();
       
       if (data.posts && data.posts.length > 0) {

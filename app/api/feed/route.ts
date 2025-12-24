@@ -23,8 +23,11 @@ export async function GET(request: NextRequest) {
     const currentUser = await User.findById(user.id).select('following');
     const followingIds = currentUser?.following || [];
     
-    // Include current user's posts in feed
-    const authorIds = [...followingIds.map((id: any) => id.toString()), user.id];
+    // Include current user's posts in feed - convert all to ObjectIds
+    const authorIds = [
+      ...followingIds.map((id: any) => new mongoose.Types.ObjectId(id.toString())),
+      new mongoose.Types.ObjectId(user.id),
+    ];
 
     const query: any = {
       author: { $in: authorIds },
@@ -49,18 +52,18 @@ export async function GET(request: NextRequest) {
       ...post,
       _id: post._id.toString(),
       author: {
-        _id: post.author._id.toString(),
-        username: post.author.username,
-        name: post.author.name,
-        avatar: post.author.avatar,
+        _id: (post.author as any)?._id?.toString() || post.author,
+        username: (post.author as any)?.username || '',
+        name: (post.author as any)?.name || '',
+        avatar: (post.author as any)?.avatar || '',
       },
-      likes: post.likes.map((like: any) => ({
-        _id: like._id.toString(),
-        username: like.username,
-        name: like.name,
-        avatar: like.avatar,
+      likes: ((post.likes as any[]) || []).map((like: any) => ({
+        _id: like._id?.toString() || like,
+        username: like.username || '',
+        name: like.name || '',
+        avatar: like.avatar || '',
       })),
-      createdAt: post.createdAt.toISOString(),
+      createdAt: post.createdAt?.toISOString() || new Date().toISOString(),
     }));
 
     return NextResponse.json({

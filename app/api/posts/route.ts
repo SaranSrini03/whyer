@@ -27,14 +27,33 @@ export async function GET(request: NextRequest) {
       .populate('author', 'username name avatar')
       .populate('likes', 'username name avatar')
       .sort({ createdAt: -1 })
-      .limit(limit + 1);
+      .limit(limit + 1)
+      .lean();
 
     const hasMore = posts.length > limit;
     const postsToReturn = hasMore ? posts.slice(0, limit) : posts;
     const nextCursor = hasMore ? postsToReturn[postsToReturn.length - 1]._id.toString() : null;
 
+    const serializedPosts = postsToReturn.map((post: any) => ({
+      ...post,
+      _id: post._id.toString(),
+      author: {
+        _id: (post.author as any)._id.toString(),
+        username: (post.author as any).username,
+        name: (post.author as any).name,
+        avatar: (post.author as any).avatar,
+      },
+      likes: (post.likes || []).map((like: any) => ({
+        _id: like._id.toString(),
+        username: like.username,
+        name: like.name,
+        avatar: like.avatar,
+      })),
+      createdAt: post.createdAt.toISOString(),
+    }));
+
     return NextResponse.json({
-      posts: postsToReturn,
+      posts: serializedPosts,
       nextCursor,
       hasMore,
     });
@@ -72,9 +91,32 @@ export async function POST(request: NextRequest) {
 
     const populatedPost = await Post.findById(post._id)
       .populate('author', 'username name avatar')
-      .populate('likes', 'username name avatar');
+      .populate('likes', 'username name avatar')
+      .lean();
 
-    return NextResponse.json(populatedPost, { status: 201 });
+    if (!populatedPost) {
+      return NextResponse.json({ error: 'Failed to create post' }, { status: 500 });
+    }
+
+    const serializedPost = {
+      ...populatedPost,
+      _id: populatedPost._id.toString(),
+      author: {
+        _id: (populatedPost.author as any)._id.toString(),
+        username: (populatedPost.author as any).username,
+        name: (populatedPost.author as any).name,
+        avatar: (populatedPost.author as any).avatar,
+      },
+      likes: ((populatedPost.likes as any[]) || []).map((like: any) => ({
+        _id: like._id.toString(),
+        username: like.username,
+        name: like.name,
+        avatar: like.avatar,
+      })),
+      createdAt: populatedPost.createdAt.toISOString(),
+    };
+
+    return NextResponse.json(serializedPost, { status: 201 });
   } catch (error) {
     console.error('Error creating post:', error);
     return NextResponse.json({ error: 'Failed to create post' }, { status: 500 });
