@@ -41,7 +41,7 @@ export default function Feed({ currentUserId }: { currentUserId?: string }) {
       // Get current cursor value
       const currentCursor = reset ? null : cursor;
       const url = `/api/feed${currentCursor ? `?cursor=${currentCursor}` : ''}`;
-      const response = await fetch(url);
+      const response = await fetch(url, { cache: 'no-store' });
       const data = await response.json();
 
       if (reset) {
@@ -59,9 +59,54 @@ export default function Feed({ currentUserId }: { currentUserId?: string }) {
     }
   }, [cursor]);
 
+  const checkForNewPosts = useCallback(async () => {
+    if (posts.length === 0 || loading) return;
+
+    try {
+      const response = await fetch('/api/feed?limit=10', { cache: 'no-store' });
+      const data = await response.json();
+      
+      if (data.posts && data.posts.length > 0) {
+        const firstPostId = posts[0]?._id;
+        const newPosts = data.posts.filter(
+          (newPost: Post) => !posts.some((existingPost) => existingPost._id === newPost._id)
+        );
+
+        if (newPosts.length > 0) {
+          setPosts((prev) => {
+            const existingIds = new Set(prev.map((p) => p._id));
+            const uniqueNewPosts = newPosts.filter((p: Post) => !existingIds.has(p._id));
+            return [...uniqueNewPosts, ...prev];
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error checking for new posts:', error);
+    }
+  }, [posts, loading]);
+
   useEffect(() => {
     fetchPosts(true);
   }, []);
+
+  useEffect(() => {
+    if (posts.length === 0) return;
+
+    const interval = setInterval(() => {
+      checkForNewPosts();
+    }, 5000);
+
+    const handleNewPost = () => {
+      checkForNewPosts();
+    };
+
+    window.addEventListener('newPostCreated', handleNewPost);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('newPostCreated', handleNewPost);
+    };
+  }, [posts, checkForNewPosts]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

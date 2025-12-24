@@ -50,9 +50,34 @@ export default function MessageThread({ userId, currentUserId }: MessageThreadPr
     }
   };
 
+  const markAsRead = async () => {
+    try {
+      const response = await fetch('/api/messages/read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      if (response.ok) {
+        window.dispatchEvent(new CustomEvent('messagesRead'));
+      }
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  };
+
   useEffect(() => {
-    fetchMessages();
-    const interval = setInterval(fetchMessages, 3000); // Poll every 3 seconds
+    const initializeChat = async () => {
+      await fetchMessages();
+      await markAsRead();
+    };
+    
+    initializeChat();
+    
+    const interval = setInterval(() => {
+      fetchMessages();
+      markAsRead();
+    }, 3000);
+    
     return () => clearInterval(interval);
   }, [userId]);
 
@@ -83,6 +108,13 @@ export default function MessageThread({ userId, currentUserId }: MessageThreadPr
       console.error('Error sending message:', error);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as any);
     }
   };
 
@@ -162,6 +194,7 @@ export default function MessageThread({ userId, currentUserId }: MessageThreadPr
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             className="flex-1 resize-none bg-gray-900 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-700"
             rows={2}

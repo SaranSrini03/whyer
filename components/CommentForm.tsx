@@ -45,6 +45,13 @@ export default function CommentForm({ postId, currentUserId }: CommentFormProps)
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as any);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="mb-6">
       {error && (
@@ -55,6 +62,7 @@ export default function CommentForm({ postId, currentUserId }: CommentFormProps)
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder="Write a comment..."
         className="w-full resize-none bg-gray-900 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-700"
         rows={3}

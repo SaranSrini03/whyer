@@ -38,14 +38,33 @@ export async function GET(request: NextRequest) {
       .populate('author', 'username name avatar')
       .populate('likes', 'username name avatar')
       .sort({ createdAt: -1 })
-      .limit(limit + 1);
+      .limit(limit + 1)
+      .lean();
 
     const hasMore = posts.length > limit;
     const postsToReturn = hasMore ? posts.slice(0, limit) : posts;
     const nextCursor = hasMore ? postsToReturn[postsToReturn.length - 1]._id.toString() : null;
 
+    const serializedPosts = postsToReturn.map((post: any) => ({
+      ...post,
+      _id: post._id.toString(),
+      author: {
+        _id: post.author._id.toString(),
+        username: post.author.username,
+        name: post.author.name,
+        avatar: post.author.avatar,
+      },
+      likes: post.likes.map((like: any) => ({
+        _id: like._id.toString(),
+        username: like.username,
+        name: like.name,
+        avatar: like.avatar,
+      })),
+      createdAt: post.createdAt.toISOString(),
+    }));
+
     return NextResponse.json({
-      posts: postsToReturn,
+      posts: serializedPosts,
       nextCursor,
       hasMore,
     });

@@ -27,6 +27,7 @@ export default function CreatePost({ onPostCreated }: { onPostCreated?: () => vo
         } else {
           router.refresh();
         }
+        window.dispatchEvent(new CustomEvent('newPostCreated'));
       }
     } catch (error) {
       console.error('Error creating post:', error);
@@ -35,11 +36,19 @@ export default function CreatePost({ onPostCreated }: { onPostCreated?: () => vo
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as any);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="border-b border-gray-800 px-4 py-4">
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder="What's happening?"
         className="w-full resize-none bg-transparent text-white placeholder-gray-500 focus:outline-none"
         rows={3}

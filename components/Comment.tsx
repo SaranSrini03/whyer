@@ -66,6 +66,13 @@ export default function Comment({ comment, postId, currentUserId, onReply }: Com
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleReply(e as any);
+    }
+  };
+
   return (
     <div className="py-4 border-b border-gray-800">
       <div className="flex gap-3">
@@ -120,6 +127,7 @@ export default function Comment({ comment, postId, currentUserId, onReply }: Com
               <textarea
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder="Write a reply..."
                 className="w-full resize-none bg-gray-900 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-700 text-sm"
                 rows={2}
