@@ -6,12 +6,13 @@ import { getCurrentUser } from '@/lib/utils';
 // GET /api/users/[username] - Get user by username
 export async function GET(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   try {
     await connectDB();
 
-    const user = await User.findOne({ username: params.username })
+    const { username } = await params;
+    const user = await User.findOne({ username })
       .select('username name avatar bio followers following createdAt')
       .populate('followers', 'username name avatar')
       .populate('following', 'username name avatar');

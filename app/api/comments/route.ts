@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import connectDB from '@/lib/db';
 import Comment from '@/models/Comment';
 import Post from '@/models/Post';
+import User from '@/models/User';
 import { getCurrentUser } from '@/lib/utils';
 
 // GET /api/comments?postId=xxx - Get comments for a post
@@ -28,12 +29,32 @@ export async function GET(request: NextRequest) {
     // Get replies for each comment
     const commentsWithReplies = await Promise.all(
       comments.map(async (comment) => {
+        const commentObj = comment.toObject();
         const replies = await Comment.find({ parentComment: comment._id })
           .populate('author', 'username name avatar')
-          .sort({ createdAt: 1 });
+          .sort({ createdAt: 1 })
+          .lean();
         return {
-          ...comment.toObject(),
-          replies,
+          ...commentObj,
+          _id: commentObj._id.toString(),
+          author: {
+            _id: commentObj.author._id.toString(),
+            username: commentObj.author.username,
+            name: commentObj.author.name,
+            avatar: commentObj.author.avatar,
+          },
+          createdAt: commentObj.createdAt.toISOString(),
+          replies: replies.map((reply: any) => ({
+            ...reply,
+            _id: reply._id.toString(),
+            author: {
+              _id: reply.author._id.toString(),
+              username: reply.author.username,
+              name: reply.author.name,
+              avatar: reply.author.avatar,
+            },
+            createdAt: reply.createdAt.toISOString(),
+          })),
         };
       })
     );
@@ -55,6 +76,17 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
+    // Verify user exists in database
+    if (!mongoose.Types.ObjectId.isValid(user.id)) {
+      return NextResponse.json({ error: 'Invalid user ID' }, { status: 400 });
+    }
+
+    const dbUser = await User.findById(user.id);
+    if (!dbUser) {
+      console.error(`User not found in database: ${user.id}`);
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
     const body = await request.json();
     const { postId, content, parentCommentId } = body;
 
@@ -62,9 +94,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Post ID and content are required' }, { status: 400 });
     }
 
+    // Validate postId format
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+      return NextResponse.json({ error: 'Invalid post ID format' }, { status: 400 });
+    }
+
     // Verify post exists
     const post = await Post.findById(postId);
     if (!post) {
+      console.error(`Post not found in database: ${postId}`);
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
@@ -84,9 +122,26 @@ export async function POST(request: NextRequest) {
     });
 
     const populatedComment = await Comment.findById(comment._id)
-      .populate('author', 'username name avatar');
+      .populate('author', 'username name avatar')
+      .lean();
 
-    return NextResponse.json(populatedComment, { status: 201 });
+    if (!populatedComment || !populatedComment.author) {
+      return NextResponse.json({ error: 'Failed to create comment' }, { status: 500 });
+    }
+
+    const responseComment = {
+      ...populatedComment,
+      _id: populatedComment._id.toString(),
+      author: {
+        _id: (populatedComment.author as any)._id.toString(),
+        username: (populatedComment.author as any).username,
+        name: (populatedComment.author as any).name,
+        avatar: (populatedComment.author as any).avatar,
+      },
+      createdAt: populatedComment.createdAt.toISOString(),
+    };
+
+    return NextResponse.json(responseComment, { status: 201 });
   } catch (error) {
     console.error('Error creating comment:', error);
     return NextResponse.json({ error: 'Failed to create comment' }, { status: 500 });

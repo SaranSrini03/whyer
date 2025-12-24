@@ -41,7 +41,25 @@ async function getComments(postId: string) {
           .lean();
         return {
           ...comment,
-          replies,
+          _id: comment._id.toString(),
+          author: {
+            _id: comment.author._id.toString(),
+            username: comment.author.username,
+            name: comment.author.name,
+            avatar: comment.author.avatar,
+          },
+          createdAt: comment.createdAt.toISOString(),
+          replies: replies.map((reply: any) => ({
+            ...reply,
+            _id: reply._id.toString(),
+            author: {
+              _id: reply.author._id.toString(),
+              username: reply.author.username,
+              name: reply.author.name,
+              avatar: reply.author.avatar,
+            },
+            createdAt: reply.createdAt.toISOString(),
+          })),
         };
       })
     );
@@ -56,15 +74,16 @@ async function getComments(postId: string) {
 export default async function PostPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session) {
     redirect('/auth/signin');
   }
 
-  const post = await getPost(params.id);
-  const comments = await getComments(params.id);
+  const { id } = await params;
+  const post = await getPost(id);
+  const comments = await getComments(id);
 
   if (!post) {
     return (
@@ -86,7 +105,7 @@ export default async function PostPage({
         <div className="border-t border-gray-800 pt-4 mt-4">
           <h2 className="text-xl font-semibold mb-4">Comments</h2>
           
-          <CommentForm postId={params.id} currentUserId={session.user.id} />
+          <CommentForm postId={id} currentUserId={session.user.id} />
           
           <div className="mt-6">
             {comments.length === 0 ? (
@@ -96,7 +115,7 @@ export default async function PostPage({
                 <CommentComponent
                   key={comment._id}
                   comment={comment}
-                  postId={params.id}
+                  postId={id}
                   currentUserId={session.user.id}
                 />
               ))

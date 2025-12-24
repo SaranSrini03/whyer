@@ -11,6 +11,7 @@ interface CommentFormProps {
 export default function CommentForm({ postId, currentUserId }: CommentFormProps) {
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -18,6 +19,7 @@ export default function CommentForm({ postId, currentUserId }: CommentFormProps)
     if (!content.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
+    setError(null);
     try {
       const response = await fetch('/api/comments', {
         method: 'POST',
@@ -31,9 +33,13 @@ export default function CommentForm({ postId, currentUserId }: CommentFormProps)
       if (response.ok) {
         setContent('');
         router.refresh();
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to post comment');
       }
     } catch (error) {
       console.error('Error creating comment:', error);
+      setError('Failed to post comment. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -41,6 +47,11 @@ export default function CommentForm({ postId, currentUserId }: CommentFormProps)
 
   return (
     <form onSubmit={handleSubmit} className="mb-6">
+      {error && (
+        <div className="mb-3 text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded px-4 py-2">
+          {error}
+        </div>
+      )}
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}

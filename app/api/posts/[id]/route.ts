@@ -6,12 +6,13 @@ import { getCurrentUser } from '@/lib/utils';
 // GET /api/posts/[id] - Get a single post
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
 
-    const post = await Post.findById(params.id)
+    const { id } = await params;
+    const post = await Post.findById(id)
       .populate('author', 'username name avatar')
       .populate('likes', 'username name avatar');
 

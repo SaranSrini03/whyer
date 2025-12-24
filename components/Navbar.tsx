@@ -15,7 +15,7 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-gray-800 bg-black/80 backdrop-blur-sm">
-      <div className="mx-auto max-w-2xl px-4">
+      <div className="mx-auto max-w-7xl px-4">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="text-xl font-bold">
             whyer
@@ -25,7 +25,7 @@ export default function Navbar() {
             <div className="flex items-center gap-4">
               <Link
                 href="/messages"
-                className="text-sm text-gray-400 hover:text-white transition-colors"
+                className="text-sm text-gray-400 hover:text-white transition-colors hidden md:block"
               >
                 Messages
               </Link>
@@ -41,7 +41,7 @@ export default function Navbar() {
               </Link>
               <button
                 onClick={handleSignOut}
-                className="text-sm text-gray-400 hover:text-white transition-colors"
+                className="text-sm text-gray-400 hover:text-white transition-colors hidden md:block"
               >
                 Sign Out
               </button>

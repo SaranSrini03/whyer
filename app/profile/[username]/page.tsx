@@ -31,8 +31,18 @@ async function getUser(username: string, currentUserId?: string) {
 
     return {
       ...user,
+      _id: user._id.toString(),
+      followers: user.followers.map((follower: any) => ({
+        ...follower,
+        _id: follower._id.toString(),
+      })),
+      following: user.following.map((following: any) => ({
+        ...following,
+        _id: following._id.toString(),
+      })),
       isFollowing,
       isOwnProfile,
+      createdAt: user.createdAt.toISOString(),
     };
   } catch (error) {
     console.error('Error fetching user:', error);
@@ -58,15 +68,16 @@ async function getUserPosts(userId: string) {
 export default async function ProfilePage({
   params,
 }: {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session) {
     redirect('/auth/signin');
   }
 
-  const user = await getUser(params.username, session.user.id);
-  const posts = user ? await getUserPosts(user._id.toString()) : [];
+  const { username } = await params;
+  const user = await getUser(username, session.user.id);
+  const posts = user ? await getUserPosts(user._id) : [];
 
   if (!user) {
     return (

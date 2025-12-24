@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -26,12 +27,15 @@ export default function Comment({ comment, postId, currentUserId, onReply }: Com
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleReply = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!replyContent.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
+    setError(null);
     try {
       const response = await fetch('/api/comments', {
         method: 'POST',
@@ -46,12 +50,17 @@ export default function Comment({ comment, postId, currentUserId, onReply }: Com
       if (response.ok) {
         setReplyContent('');
         setShowReplyForm(false);
+        router.refresh();
         if (onReply) {
           onReply();
         }
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to post reply');
       }
     } catch (error) {
       console.error('Error replying to comment:', error);
+      setError('Failed to post reply. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -92,7 +101,7 @@ export default function Comment({ comment, postId, currentUserId, onReply }: Com
             {comment.content}
           </p>
           
-          {currentUserId && (
+          {currentUserId && comment.replies !== undefined && (
             <button
               onClick={() => setShowReplyForm(!showReplyForm)}
               className="text-xs text-gray-500 hover:text-white transition-colors"
@@ -103,6 +112,11 @@ export default function Comment({ comment, postId, currentUserId, onReply }: Com
           
           {showReplyForm && (
             <form onSubmit={handleReply} className="mt-3">
+              {error && (
+                <div className="mb-2 text-xs text-red-500 bg-red-500/10 border border-red-500/20 rounded px-3 py-2">
+                  {error}
+                </div>
+              )}
               <textarea
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
@@ -123,6 +137,7 @@ export default function Comment({ comment, postId, currentUserId, onReply }: Com
                   onClick={() => {
                     setShowReplyForm(false);
                     setReplyContent('');
+                    setError(null);
                   }}
                   className="rounded-full border border-gray-700 px-4 py-1.5 text-xs font-semibold text-white hover:bg-gray-800 transition-colors"
                 >
@@ -137,7 +152,7 @@ export default function Comment({ comment, postId, currentUserId, onReply }: Com
               {comment.replies.map((reply) => (
                 <Comment
                   key={reply._id}
-                  comment={reply}
+                  comment={{ ...reply, replies: undefined }}
                   postId={postId}
                   currentUserId={currentUserId}
                   onReply={onReply}
