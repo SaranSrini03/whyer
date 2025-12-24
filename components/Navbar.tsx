@@ -53,8 +53,8 @@ export default function Navbar() {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         username={session?.user?.username}
-        userImage={session?.user?.image}
-        userName={session?.user?.name}
+        userImage={session?.user?.image ?? undefined}
+        userName={session?.user?.name ?? undefined}
         unreadCount={unreadCount}
       />
       <nav className="sticky top-0 z-50 border-b border-gray-800 bg-black/80 backdrop-blur-sm">

@@ -47,6 +47,10 @@ export async function POST(request: NextRequest) {
       .populate('author', 'username name avatar')
       .populate('likes', 'username name avatar');
 
+    if (!updatedPost) {
+      return NextResponse.json({ error: 'Post not found after update' }, { status: 404 });
+    }
+
     return NextResponse.json({
       liked: !isLiked,
       likesCount: updatedPost.likes.length,

@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     // Get replies for each comment
     const commentsWithReplies = await Promise.all(
       comments.map(async (comment) => {
-        const commentObj = comment.toObject();
+        const commentObj = comment.toObject() as any;
         const replies = await Comment.find({ parentComment: comment._id })
           .populate('author', 'username name avatar')
           .sort({ createdAt: 1 })
@@ -38,20 +38,20 @@ export async function GET(request: NextRequest) {
           ...commentObj,
           _id: commentObj._id.toString(),
           author: {
-            _id: commentObj.author._id.toString(),
-            username: commentObj.author.username,
-            name: commentObj.author.name,
-            avatar: commentObj.author.avatar,
+            _id: (commentObj.author as any)._id.toString(),
+            username: (commentObj.author as any).username,
+            name: (commentObj.author as any).name,
+            avatar: (commentObj.author as any).avatar,
           },
           createdAt: commentObj.createdAt.toISOString(),
           replies: replies.map((reply: any) => ({
             ...reply,
             _id: reply._id.toString(),
             author: {
-              _id: reply.author._id.toString(),
-              username: reply.author.username,
-              name: reply.author.name,
-              avatar: reply.author.avatar,
+              _id: (reply.author as any)._id.toString(),
+              username: (reply.author as any).username,
+              name: (reply.author as any).name,
+              avatar: (reply.author as any).avatar,
             },
             createdAt: reply.createdAt.toISOString(),
           })),
