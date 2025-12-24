@@ -2,12 +2,21 @@ import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
 
 export default withAuth(
-  function middleware() {
+  function middleware(req) {
     return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token, req }) => {
+        // Skip auth check for API routes - let them handle authentication and return JSON errors
+        if (req.nextUrl.pathname.startsWith('/api/')) {
+          return true; // Always allow, API routes handle their own auth
+        }
+        return !!token;
+      },
+    },
+    pages: {
+      signIn: '/auth/signin',
     },
   }
 );
@@ -20,6 +29,7 @@ export const config = {
     '/api/follow/:path*',
     '/api/feed/:path*',
     '/api/messages/:path*',
+    '/api/notifications/:path*',
     '/profile/:path*',
     '/messages/:path*',
     '/post/:path*',
