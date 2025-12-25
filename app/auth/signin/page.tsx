@@ -2,20 +2,39 @@
 
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, Suspense } from 'react';
+import { useEffect, Suspense, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 
 function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data: session } = useSession();
+  const { data: session, status, update } = useSession();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const hasRedirected = useRef(false);
 
   useEffect(() => {
-    if (session) {
+    if (status === 'authenticated' && session && !hasRedirected.current) {
+      hasRedirected.current = true;
       router.push(callbackUrl);
     }
-  }, [session, router, callbackUrl]);
+  }, [session, status, router, callbackUrl]);
+
+  useEffect(() => {
+    if (status === 'loading') {
+      const interval = setInterval(async () => {
+        await update();
+      }, 1000);
+      
+      const timeout = setTimeout(() => {
+        clearInterval(interval);
+      }, 15000);
+
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+      };
+    }
+  }, [status, update]);
 
   const handleSignIn = () => {
     signIn('github', { callbackUrl });
