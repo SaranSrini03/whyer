@@ -52,22 +52,27 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async jwt({ token, account, profile }) {
-      // On first sign-in, account and profile are available
-      if (account?.provider === 'github' && account.providerAccountId) {
-        await connectDB();
-        const user = await User.findOne({ githubId: account.providerAccountId });
-        if (user) {
-          token.userId = user._id.toString();
-          token.username = user.username;
+      try {
+        // On first sign-in, account and profile are available
+        if (account?.provider === 'github' && account.providerAccountId) {
+          await connectDB();
+          const user = await User.findOne({ githubId: account.providerAccountId });
+          if (user) {
+            token.userId = user._id.toString();
+            token.username = user.username;
+            token.sub = account.providerAccountId;
+          }
+        } else if (token.sub) {
+          // On subsequent requests, fetch user data from token.sub (GitHub ID)
+          await connectDB();
+          const user = await User.findOne({ githubId: token.sub });
+          if (user) {
+            token.userId = user._id.toString();
+            token.username = user.username;
+          }
         }
-      } else if (token.sub) {
-        // On subsequent requests, fetch user data from token.sub (GitHub ID)
-        await connectDB();
-        const user = await User.findOne({ githubId: token.sub });
-        if (user) {
-          token.userId = user._id.toString();
-          token.username = user.username;
-        }
+      } catch (error) {
+        console.error('Error in JWT callback:', error);
       }
       return token;
     },
@@ -88,5 +93,16 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === 'development',
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
 };
 

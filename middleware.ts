@@ -12,10 +12,11 @@ export default withAuth(
         if (req.nextUrl.pathname.startsWith('/api/')) {
           return true;
         }
-        // Check if token exists and has required user data
+        // Check if token exists
         if (!token) {
           return false;
         }
+        // Token exists, allow access
         return true;
       },
     },
