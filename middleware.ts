@@ -3,17 +3,14 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(req: NextRequest) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const pathname = req.nextUrl.pathname;
 
-  if (pathname.startsWith('/api/') || pathname.startsWith('/auth/')) {
-    return NextResponse.next();
-  }
-
-  if (!token && (pathname.startsWith('/profile/') || pathname.startsWith('/messages/') || pathname.startsWith('/messages') || pathname.startsWith('/post/'))) {
-    const signInUrl = new URL('/auth/signin', req.url);
-    signInUrl.searchParams.set('callbackUrl', pathname);
-    return NextResponse.redirect(signInUrl);
+  if (pathname.startsWith('/api/') && !pathname.startsWith('/api/auth/')) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
   }
 
   return NextResponse.next();
@@ -21,9 +18,13 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/profile/:path*',
-    '/messages/:path*',
-    '/post/:path*',
+    '/api/posts/:path*',
+    '/api/like/:path*',
+    '/api/comments/:path*',
+    '/api/follow/:path*',
+    '/api/feed/:path*',
+    '/api/messages/:path*',
+    '/api/notifications/:path*',
   ],
 };
 

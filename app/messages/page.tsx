@@ -7,7 +7,7 @@ import MessagesList from '@/components/MessagesList';
 export default async function MessagesPage() {
   const session = await getServerSession(authOptions);
   if (!session) {
-    redirect('/auth/signin');
+    redirect('/auth/signin?callbackUrl=' + encodeURIComponent('/messages'));
   }
 
   return (
