@@ -22,7 +22,6 @@ export const config = {
     '/api/like/:path*',
     '/api/comments/:path*',
     '/api/follow/:path*',
-    '/api/feed/:path*',
     '/api/messages/:path*',
     '/api/notifications/:path*',
   ],
