@@ -39,6 +39,7 @@ export default async function Home() {
                 </Link>
                 <Link
                   href="/messages"
+                  prefetch={true}
                   className="flex items-center gap-4 px-4 py-3 rounded-full hover:bg-gray-900 transition-colors text-gray-400 hover:text-white"
                 >
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,6 +49,7 @@ export default async function Home() {
                 </Link>
                 <Link
                   href={`/profile/${session.user.username}`}
+                  prefetch={true}
                   className="flex items-center gap-4 px-4 py-3 rounded-full hover:bg-gray-900 transition-colors text-gray-400 hover:text-white"
                 >
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

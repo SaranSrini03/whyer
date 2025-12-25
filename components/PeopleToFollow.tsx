@@ -75,6 +75,7 @@ export default function PeopleToFollow({ currentUserId }: { currentUserId: strin
           <div key={user._id} className="flex items-center justify-between">
             <Link
               href={`/profile/${user.username}`}
+              prefetch={true}
               className="flex items-center gap-3 flex-1 min-w-0 hover:opacity-80 transition-opacity"
             >
               <img

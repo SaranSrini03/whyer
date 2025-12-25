@@ -63,6 +63,7 @@ export default function MessagesList({ currentUserId }: { currentUserId: string 
         <Link
           key={conversation.user._id}
           href={`/messages/${conversation.user._id}`}
+          prefetch={true}
           onClick={async () => {
             const response = await fetch(`/api/messages/read`, {
               method: 'POST',

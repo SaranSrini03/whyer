@@ -56,7 +56,7 @@ export default function PostCard({ post, currentUserId, onLike }: PostCardProps)
   return (
     <article className="border-b border-gray-800 px-4 py-6 hover:bg-gray-900/50 transition-colors">
       <div className="flex gap-3">
-        <Link href={`/profile/${post.author.username}`}>
+        <Link href={`/profile/${post.author.username}`} prefetch={true}>
           <img
             src={post.author.avatar || '/default-avatar.png'}
             alt={post.author.name}
@@ -68,12 +68,14 @@ export default function PostCard({ post, currentUserId, onLike }: PostCardProps)
           <div className="flex items-center gap-2 mb-1">
             <Link
               href={`/profile/${post.author.username}`}
+              prefetch={true}
               className="font-semibold hover:underline"
             >
               {post.author.name}
             </Link>
             <Link
               href={`/profile/${post.author.username}`}
+              prefetch={true}
               className="text-gray-500 text-sm hover:underline"
             >
               @{post.author.username}
@@ -84,7 +86,7 @@ export default function PostCard({ post, currentUserId, onLike }: PostCardProps)
             </time>
           </div>
           
-          <Link href={`/post/${post._id}`}>
+          <Link href={`/post/${post._id}`} prefetch={true}>
             <p className="text-white mb-4 whitespace-pre-wrap break-words">
               {post.content}
             </p>
@@ -118,6 +120,7 @@ export default function PostCard({ post, currentUserId, onLike }: PostCardProps)
             
             <Link
               href={`/post/${post._id}`}
+              prefetch={true}
               className="flex items-center gap-2 text-gray-500 hover:text-white text-sm transition-colors"
             >
               <svg

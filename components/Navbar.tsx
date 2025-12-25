@@ -88,6 +88,7 @@ export default function Navbar() {
               <div className="flex items-center gap-4">
               <Link
                 href="/messages"
+                prefetch={true}
                 className="relative text-sm text-gray-400 hover:text-white transition-colors hidden md:flex items-center gap-2"
               >
                 <svg
@@ -112,6 +113,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/messages"
+                prefetch={true}
                 className="relative md:hidden"
               >
                 <svg
@@ -135,6 +137,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href={`/profile/${session.user.username}`}
+                prefetch={true}
                 className="flex items-center gap-2"
               >
                 <img

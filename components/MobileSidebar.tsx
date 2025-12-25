@@ -76,6 +76,7 @@ export default function MobileSidebar({
           <nav className="flex-1 space-y-2">
             <Link
               href="/"
+              prefetch={true}
               onClick={handleLinkClick}
               className={`flex items-center gap-4 px-4 py-3 rounded-full transition-colors ${
                 pathname === '/'
@@ -90,6 +91,7 @@ export default function MobileSidebar({
             </Link>
             <Link
               href="/messages"
+              prefetch={true}
               onClick={handleLinkClick}
               className={`flex items-center gap-4 px-4 py-3 rounded-full transition-colors relative ${
                 pathname?.startsWith('/messages')
@@ -115,6 +117,7 @@ export default function MobileSidebar({
             {username && (
               <Link
                 href={`/profile/${username}`}
+                prefetch={true}
                 onClick={handleLinkClick}
                 className={`flex items-center gap-4 px-4 py-3 rounded-full transition-colors ${
                   pathname?.startsWith(`/profile/${username}`)
@@ -139,6 +142,7 @@ export default function MobileSidebar({
             {username && (
               <Link
                 href={`/profile/${username}`}
+                prefetch={true}
                 onClick={handleLinkClick}
                 className="flex items-center gap-3 px-4 py-3 rounded-full hover:bg-gray-900 transition-colors mb-2"
               >

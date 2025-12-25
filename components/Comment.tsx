@@ -76,7 +76,7 @@ export default function Comment({ comment, postId, currentUserId, onReply }: Com
   return (
     <div className="py-4 border-b border-gray-800">
       <div className="flex gap-3">
-        <Link href={`/profile/${comment.author.username}`}>
+        <Link href={`/profile/${comment.author.username}`} prefetch={true}>
           <img
             src={comment.author.avatar || '/default-avatar.png'}
             alt={comment.author.name}
@@ -88,12 +88,14 @@ export default function Comment({ comment, postId, currentUserId, onReply }: Com
           <div className="flex items-center gap-2 mb-1">
             <Link
               href={`/profile/${comment.author.username}`}
+              prefetch={true}
               className="font-semibold text-sm hover:underline"
             >
               {comment.author.name}
             </Link>
             <Link
               href={`/profile/${comment.author.username}`}
+              prefetch={true}
               className="text-gray-500 text-xs hover:underline"
             >
               @{comment.author.username}

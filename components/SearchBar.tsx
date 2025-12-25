@@ -102,6 +102,7 @@ export default function SearchBar({ currentUserId }: { currentUserId: string }) 
                 <Link
                   key={user._id}
                   href={`/profile/${user.username}`}
+                  prefetch={true}
                   className="block hover:bg-gray-900 transition-colors"
                   onClick={() => {
                     setShowResults(false);

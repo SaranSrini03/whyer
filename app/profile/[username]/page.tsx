@@ -14,8 +14,6 @@ async function getUser(username: string, currentUserId?: string) {
     await connectDB();
     const user = await User.findOne({ username })
       .select('username name avatar bio followers following createdAt')
-      .populate('followers', 'username name avatar')
-      .populate('following', 'username name avatar')
       .lean();
 
     if (!user) return null;
@@ -24,22 +22,20 @@ async function getUser(username: string, currentUserId?: string) {
     let isOwnProfile = false;
     if (currentUserId) {
       isOwnProfile = user._id.toString() === currentUserId;
-      isFollowing = user.followers.some(
-        (follower: any) => follower._id.toString() === currentUserId
-      );
+      const followerIds = (user.followers || []).map((f: any) => f.toString());
+      isFollowing = followerIds.includes(currentUserId);
     }
+
+    const followerCount = user.followers?.length || 0;
+    const followingCount = user.following?.length || 0;
 
     return {
       ...user,
       _id: user._id.toString(),
-      followers: user.followers.map((follower: any) => ({
-        ...follower,
-        _id: follower._id.toString(),
-      })),
-      following: user.following.map((following: any) => ({
-        ...following,
-        _id: following._id.toString(),
-      })),
+      followers: [],
+      following: [],
+      followerCount,
+      followingCount,
       isFollowing,
       isOwnProfile,
       createdAt: user.createdAt.toISOString(),
@@ -109,10 +105,10 @@ export default async function ProfilePage({
               
               <div className="flex items-center gap-6 mb-4 text-sm">
                 <span className="text-gray-500">
-                  <span className="text-white font-semibold">{user.following?.length || 0}</span> following
+                  <span className="text-white font-semibold">{user.followingCount || 0}</span> following
                 </span>
                 <span className="text-gray-500">
-                  <span className="text-white font-semibold">{user.followers?.length || 0}</span> followers
+                  <span className="text-white font-semibold">{user.followerCount || 0}</span> followers
                 </span>
               </div>
               
@@ -125,6 +121,7 @@ export default async function ProfilePage({
                   />
                   <Link
                     href={`/messages/${user._id}`}
+                    prefetch={true}
                     className="rounded-full border border-gray-700 px-6 py-2 text-sm font-semibold text-white hover:bg-gray-900 transition-colors"
                   >
                     Message

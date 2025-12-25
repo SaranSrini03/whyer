@@ -132,6 +132,7 @@ export default function MessageThread({ userId, currentUserId }: MessageThreadPr
         <div className="border-b border-gray-800 pb-4 mb-4">
           <Link
             href={`/profile/${otherUser.username}`}
+            prefetch={true}
             className="flex items-center gap-3"
           >
             <img
