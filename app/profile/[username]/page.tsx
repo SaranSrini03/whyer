@@ -72,7 +72,8 @@ export default async function ProfilePage({
 }) {
   const session = await getServerSession(authOptions);
   if (!session) {
-    redirect('/auth/signin');
+    const { username } = await params;
+    redirect(`/auth/signin?callbackUrl=${encodeURIComponent(`/profile/${username}`)}`);
   }
 
   const { username } = await params;
