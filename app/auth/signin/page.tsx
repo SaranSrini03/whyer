@@ -1,22 +1,24 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 
 export default function SignIn() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
 
   useEffect(() => {
     if (session) {
-      router.push('/');
+      router.push(callbackUrl);
     }
-  }, [session, router]);
+  }, [session, router, callbackUrl]);
 
   const handleSignIn = () => {
-    signIn('github', { callbackUrl: '/' });
+    signIn('github', { callbackUrl });
   };
 
   return (

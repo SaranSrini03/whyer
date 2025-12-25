@@ -10,9 +10,13 @@ export default withAuth(
       authorized: ({ token, req }) => {
         // Skip auth check for API routes - let them handle authentication and return JSON errors
         if (req.nextUrl.pathname.startsWith('/api/')) {
-          return true; // Always allow, API routes handle their own auth
+          return true;
         }
-        return !!token;
+        // Check if token exists and has required user data
+        if (!token) {
+          return false;
+        }
+        return true;
       },
     },
     pages: {
