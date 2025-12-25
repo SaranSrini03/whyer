@@ -12,8 +12,10 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async redirect({ url, baseUrl }) {
-      if (url.startsWith('/')) return `${baseUrl}${url}`;
-      if (new URL(url).origin === baseUrl) return url;
+      const callbackUrl = url.startsWith('/') ? `${baseUrl}${url}` : url;
+      if (new URL(callbackUrl).origin === baseUrl) {
+        return callbackUrl;
+      }
       return baseUrl;
     },
     async signIn({ user, account, profile }) {

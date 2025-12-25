@@ -2,7 +2,7 @@
 
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, Suspense, useRef } from 'react';
+import { useEffect, Suspense, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 
 function SignInForm() {
@@ -11,33 +11,59 @@ function SignInForm() {
   const { data: session, status, update } = useSession();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
   const hasRedirected = useRef(false);
+  const [isChecking, setIsChecking] = useState(false);
 
   useEffect(() => {
     if (status === 'authenticated' && session && !hasRedirected.current) {
       hasRedirected.current = true;
-      router.push(callbackUrl);
+      window.location.href = callbackUrl;
     }
-  }, [session, status, router, callbackUrl]);
+  }, [session, status, callbackUrl]);
 
   useEffect(() => {
-    if (status === 'loading') {
-      const interval = setInterval(async () => {
-        await update();
-      }, 1000);
+    if (status === 'loading' && !isChecking) {
+      setIsChecking(true);
+      let attempts = 0;
+      const maxAttempts = 30;
       
-      const timeout = setTimeout(() => {
-        clearInterval(interval);
-      }, 15000);
-
-      return () => {
-        clearInterval(interval);
-        clearTimeout(timeout);
+      const checkSession = async () => {
+        attempts++;
+        const updatedSession = await update();
+        
+        if (updatedSession && updatedSession.user) {
+          setIsChecking(false);
+          if (!hasRedirected.current) {
+            hasRedirected.current = true;
+            window.location.href = callbackUrl;
+          }
+          return;
+        }
+        
+        if (attempts < maxAttempts) {
+          setTimeout(checkSession, 500);
+        } else {
+          setIsChecking(false);
+        }
       };
+      
+      checkSession();
     }
-  }, [status, update]);
+  }, [status, update, isChecking, router, callbackUrl]);
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      const checkUrlParams = async () => {
+        const error = searchParams.get('error');
+        if (error) {
+          console.error('OAuth error:', error);
+        }
+      };
+      checkUrlParams();
+    }
+  }, [status, searchParams]);
 
   const handleSignIn = () => {
-    signIn('github', { callbackUrl });
+    signIn('github', { callbackUrl, redirect: true });
   };
 
   return (
