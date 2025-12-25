@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -26,7 +26,7 @@ interface PostCardProps {
   onLike?: () => void;
 }
 
-export default function PostCard({ post, currentUserId, onLike }: PostCardProps) {
+const PostCard = memo(function PostCard({ post, currentUserId, onLike }: PostCardProps) {
   const [isLiking, setIsLiking] = useState(false);
   const isLiked = currentUserId
     ? post.likes.some((like) => like._id === currentUserId)
@@ -143,5 +143,9 @@ export default function PostCard({ post, currentUserId, onLike }: PostCardProps)
       </div>
     </article>
   );
-}
+});
+
+PostCard.displayName = 'PostCard';
+
+export default PostCard;
 

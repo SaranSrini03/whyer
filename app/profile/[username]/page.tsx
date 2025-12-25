@@ -78,65 +78,78 @@ export default async function ProfilePage({
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] bg-grid-pattern"></div>
         <Navbar />
-        <div className="max-w-2xl mx-auto pt-8 px-4">
-          <p className="text-center text-gray-500">User not found</p>
+        <div className="relative z-10 max-w-2xl mx-auto pt-8 px-4">
+          <div className="bg-gradient-to-b from-white/[0.03] to-white/[0.01] rounded-2xl p-8 border border-white/10 backdrop-blur-xl">
+            <p className="text-center text-gray-500">User not found</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black relative overflow-hidden">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] bg-grid-pattern"></div>
+      
       <Navbar />
-      <div className="max-w-2xl mx-auto pt-8 px-4">
-        <div className="mb-8">
-          <div className="flex items-start gap-4 mb-4">
-            <img
-              src={user.avatar || '/default-avatar.png'}
-              alt={user.name}
-              className="h-20 w-20 rounded-full"
-            />
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold mb-1">{user.name}</h1>
-              <p className="text-gray-500 mb-2">@{user.username}</p>
-              {user.bio && <p className="text-white mb-4">{user.bio}</p>}
-              
-              <div className="flex items-center gap-6 mb-4 text-sm">
-                <span className="text-gray-500">
-                  <span className="text-white font-semibold">{user.followingCount || 0}</span> following
-                </span>
-                <span className="text-gray-500">
-                  <span className="text-white font-semibold">{user.followerCount || 0}</span> followers
-                </span>
-              </div>
-              
-              {!user.isOwnProfile && (
-                <div className="flex gap-3">
-                  <FollowButton
-                    userId={user._id}
-                    isFollowing={user.isFollowing}
-                    currentUserId={session.user.id}
-                  />
-                  <Link
-                    href={`/messages/${user._id}`}
-                    prefetch={true}
-                    className="rounded-full border border-gray-700 px-6 py-2 text-sm font-semibold text-white hover:bg-gray-900 transition-colors"
-                  >
-                    Message
-                  </Link>
+      <div className="relative z-10 max-w-2xl mx-auto pt-8 px-4">
+        <div className="mb-8 opacity-0 animate-[fadeIn_0.7s_ease-out_0.2s_forwards]">
+          <div className="bg-gradient-to-b from-white/[0.03] to-white/[0.01] rounded-2xl p-6 border border-white/10 backdrop-blur-xl">
+            <div className="flex items-start gap-4 mb-4">
+              <img
+                src={user.avatar || '/default-avatar.png'}
+                alt={user.name}
+                className="h-20 w-20 rounded-full border-2 border-white/10"
+              />
+              <div className="flex-1">
+                <h1 className="text-3xl font-semibold mb-1 tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent">
+                  {user.name}
+                </h1>
+                <p className="text-gray-500 mb-2 font-medium">@{user.username}</p>
+                {user.bio && <p className="text-gray-300 mb-4 text-sm leading-relaxed">{user.bio}</p>}
+                
+                <div className="flex items-center gap-6 mb-4 text-sm">
+                  <span className="text-gray-500">
+                    <span className="text-white font-semibold">{user.followingCount || 0}</span> following
+                  </span>
+                  <span className="text-gray-500">
+                    <span className="text-white font-semibold">{user.followerCount || 0}</span> followers
+                  </span>
                 </div>
-              )}
+                
+                {!user.isOwnProfile && (
+                  <div className="flex gap-3">
+                    <FollowButton
+                      userId={user._id}
+                      isFollowing={user.isFollowing}
+                      currentUserId={session.user.id}
+                    />
+                    <Link
+                      href={`/messages/${user._id}`}
+                      prefetch={true}
+                      className="rounded-xl border border-white/10 px-6 py-2 text-sm font-medium text-white hover:bg-white/5 transition-all duration-200 hover:border-white/20"
+                    >
+                      Message
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-4">
-          <h2 className="text-xl font-semibold mb-4">Posts</h2>
-          <div className="divide-y divide-gray-800">
+        <div className="border-t border-white/10 pt-6 opacity-0 translate-y-4 animate-[fadeInUp_0.7s_ease-out_0.4s_forwards]">
+          <h2 className="text-2xl font-semibold mb-6 tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent">
+            Posts
+          </h2>
+          <div className="space-y-0">
             {posts.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">No posts yet</p>
+              <div className="bg-gradient-to-b from-white/[0.03] to-white/[0.01] rounded-2xl p-8 border border-white/10 backdrop-blur-xl text-center">
+                <p className="text-gray-500">No posts yet</p>
+              </div>
             ) : (
               posts.map((post: any) => (
                 <PostCard

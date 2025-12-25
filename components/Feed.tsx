@@ -41,7 +41,9 @@ export default function Feed({ currentUserId }: { currentUserId?: string }) {
       // Get current cursor value
       const currentCursor = reset ? null : cursor;
       const url = `/api/feed${currentCursor ? `?cursor=${currentCursor}` : ''}`;
-      const response = await fetch(url, { cache: 'no-store' });
+      const response = await fetch(url, { 
+        next: { revalidate: 10 } // Cache for 10 seconds
+      });
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -77,7 +79,9 @@ export default function Feed({ currentUserId }: { currentUserId?: string }) {
     if (posts.length === 0 || loading) return;
 
     try {
-      const response = await fetch('/api/feed?limit=10', { cache: 'no-store' });
+      const response = await fetch('/api/feed?limit=10', { 
+        next: { revalidate: 5 } // Cache for 5 seconds
+      });
       
       if (!response.ok) {
         return;
@@ -118,7 +122,7 @@ export default function Feed({ currentUserId }: { currentUserId?: string }) {
 
     const interval = setInterval(() => {
       checkForNewPosts();
-    }, 5000);
+    }, 15000); // Reduced from 5s to 15s
 
     const handleNewPost = () => {
       checkForNewPosts();

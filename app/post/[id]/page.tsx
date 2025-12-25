@@ -87,29 +87,42 @@ export default async function PostPage({
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] bg-grid-pattern"></div>
         <Navbar />
-        <div className="max-w-2xl mx-auto pt-8 px-4">
-          <p className="text-center text-gray-500">Post not found</p>
+        <div className="relative z-10 max-w-2xl mx-auto pt-8 px-4">
+          <div className="bg-gradient-to-b from-white/[0.03] to-white/[0.01] rounded-2xl p-8 border border-white/10 backdrop-blur-xl">
+            <p className="text-center text-gray-500">Post not found</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black relative overflow-hidden">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] bg-grid-pattern"></div>
+      
       <Navbar />
-      <div className="max-w-2xl mx-auto pt-8 px-4">
-        <PostCard post={post} currentUserId={session.user.id} />
+      <div className="relative z-10 max-w-2xl mx-auto pt-8 px-4">
+        <div className="opacity-0 animate-[fadeIn_0.7s_ease-out_0.2s_forwards]">
+          <PostCard post={post} currentUserId={session.user.id} />
+        </div>
         
-        <div className="border-t border-gray-800 pt-4 mt-4">
-          <h2 className="text-xl font-semibold mb-4">Comments</h2>
+        <div className="border-t border-white/10 pt-6 mt-6 opacity-0 translate-y-4 animate-[fadeInUp_0.7s_ease-out_0.4s_forwards]">
+          <h2 className="text-2xl font-semibold mb-6 tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent">
+            Comments
+          </h2>
           
-          <CommentForm postId={id} currentUserId={session.user.id} />
+          <div className="mb-6">
+            <CommentForm postId={id} currentUserId={session.user.id} />
+          </div>
           
-          <div className="mt-6">
+          <div className="mt-6 space-y-0">
             {comments.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">No comments yet</p>
+              <div className="bg-gradient-to-b from-white/[0.03] to-white/[0.01] rounded-2xl p-8 border border-white/10 backdrop-blur-xl text-center">
+                <p className="text-gray-500">No comments yet</p>
+              </div>
             ) : (
               comments.map((comment: any) => (
                 <CommentComponent

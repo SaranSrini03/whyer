@@ -17,3 +17,45 @@ body {
   color: #ffffff;
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Performance optimizations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Optimize animations */
+[class*="animate-"] {
+  will-change: transform, opacity;
+}
+
+/* Optimize grid background rendering */
+.bg-grid-pattern {
+  will-change: auto;
+  transform: translateZ(0);
+}
