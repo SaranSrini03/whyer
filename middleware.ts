@@ -1,40 +1,26 @@
-import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
-export default withAuth(
-  function middleware(req) {
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const pathname = req.nextUrl.pathname;
+
+  if (pathname.startsWith('/api/') || pathname.startsWith('/auth/')) {
     return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        // Skip auth check for API routes - let them handle authentication and return JSON errors
-        if (req.nextUrl.pathname.startsWith('/api/')) {
-          return true;
-        }
-        // Check if token exists
-        if (!token) {
-          return false;
-        }
-        // Token exists, allow access
-        return true;
-      },
-    },
-    pages: {
-      signIn: '/auth/signin',
-    },
   }
-);
+
+  if (!token && (pathname.startsWith('/profile/') || pathname.startsWith('/messages/') || pathname.startsWith('/messages') || pathname.startsWith('/post/'))) {
+    const signInUrl = new URL('/auth/signin', req.url);
+    signInUrl.searchParams.set('callbackUrl', pathname);
+    return NextResponse.redirect(signInUrl);
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
-    '/api/posts/:path*',
-    '/api/like/:path*',
-    '/api/comments/:path*',
-    '/api/follow/:path*',
-    '/api/feed/:path*',
-    '/api/messages/:path*',
-    '/api/notifications/:path*',
     '/profile/:path*',
     '/messages/:path*',
     '/post/:path*',
